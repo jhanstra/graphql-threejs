@@ -1,6 +1,6 @@
 import React from 'react';
 import ApolloClient from 'apollo-boost'
-import { ApolloProvider } from 'react-apollo'
+import { ApolloProvider, useQuery, useMutation } from 'react-apollo-hooks'
 import gql from 'graphql-tag'
 import logo from './logo.svg';
 import './App.css';
@@ -9,7 +9,7 @@ const client = new ApolloClient({
   uri: 'https://api-useast.graphcms.com/v1/cjv5gk6pi75rk01eth0gr5vq1/master'
 })
 
-const testQuery = gql`
+const GET_POINTS = gql`
 {
   points {
     x
@@ -19,31 +19,40 @@ const testQuery = gql`
 }
 `
 
-client.query({
-  query: testQuery
-}).then(res => console.log(res))
+// const GENERATE_POINTS = gql`
+// `
+
+const generatePoints = () => {
+  for (let i = 0; i < 50; i++) {
+    const x = Math.random() * 50
+    const y = Math.random() * 50
+    const z = Math.random() * 50
+
+  }
+}
 
 function App() {
   return (
     <ApolloProvider client={client}>
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      <Fun />
     </ApolloProvider>
   );
+}
+
+const Fun = props => {
+  const { data, error, loading } = useQuery(GET_POINTS)
+  // const generatePoints = useMutation(GENERATE_POINTS)
+  if (loading) return <p>loading</p>
+  return (
+    <div className="App">
+      <header className="App-header">
+        <ul>
+          {data.points.map(point => <li>{point.x} {point.y} {point.z}</li>)}
+        </ul>
+        <button onClick={generatePoints}>Generate Points</button>
+      </header>
+    </div>
+  )
 }
 
 export default App;
