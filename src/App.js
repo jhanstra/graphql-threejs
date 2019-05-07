@@ -2,7 +2,6 @@ import React from 'react';
 import ApolloClient from 'apollo-boost'
 import { ApolloProvider, useQuery, useMutation } from 'react-apollo-hooks'
 import gql from 'graphql-tag'
-import logo from './logo.svg';
 import './App.css';
 
 const client = new ApolloClient({
@@ -19,17 +18,27 @@ const GET_POINTS = gql`
 }
 `
 
-// const GENERATE_POINTS = gql`
-// `
-
-const generatePoints = () => {
-  for (let i = 0; i < 50; i++) {
-    const x = Math.random() * 50
-    const y = Math.random() * 50
-    const z = Math.random() * 50
-
+const GENERATE_POINTS = gql`
+ mutation AddPoint($x: Float, $y: Float, $z: Float) {
+  createPoint(data:{
+    x: $x,
+    y: $y,
+    z: $z,
+  }) {
+    x,
+    y,
+    z
   }
 }
+`
+
+const random = () => ({
+  variables: {
+    x: Math.round(Math.random() * 500),
+    y: Math.round(Math.random() * 500),
+    z: Math.round(Math.random() * 500),
+  }
+})
 
 function App() {
   return (
@@ -41,7 +50,7 @@ function App() {
 
 const Fun = props => {
   const { data, error, loading } = useQuery(GET_POINTS)
-  // const generatePoints = useMutation(GENERATE_POINTS)
+  const generatePoints = useMutation(GENERATE_POINTS)
   if (loading) return <p>loading</p>
   return (
     <div className="App">
@@ -49,7 +58,7 @@ const Fun = props => {
         <ul>
           {data.points.map(point => <li>{point.x} {point.y} {point.z}</li>)}
         </ul>
-        <button onClick={generatePoints}>Generate Points</button>
+        <button onClick={generatePoints(random())}>Generate Point</button>
       </header>
     </div>
   )
